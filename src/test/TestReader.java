@@ -20,7 +20,6 @@ public class TestReader {
 		File[] files = new File(FilesPath).listFiles(
 				new FilenameFilter() {
 					
-					@Override
 					public boolean accept(File dir, String name) {
 						return name.endsWith(".txt");
 					}
