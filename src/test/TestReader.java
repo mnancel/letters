@@ -7,13 +7,13 @@ import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.CharBuffer;
 
-import clean.Cleaner;
+import clean.RegexpCleaner;
 
 public class TestReader {
 	
 	static final String FilesPath = "TestFiles";
 	static final int NbCharacters = 5000;
-	static final Cleaner commaCleaner = new Cleaner("([^\\.])([\\s\\.]+\\.)+", "$1.");
+	static final RegexpCleaner commaCleaner = new RegexpCleaner("([^\\.])([\\s\\.]+\\.)+", "$1.");
 	
 	public static void main(String[] args) {
 		
