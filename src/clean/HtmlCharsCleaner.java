@@ -6,8 +6,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import main.CountLettersFromFile;
+import count.CountLettersFromFile;
 
+/**
+ * Replaces all web characters (e.g. '&nbsp;') by their UTF8 equivalent.
+ * 
+ * @author Mathieu Nancel
+ *
+ */
 public class HtmlCharsCleaner extends Cleaner {
 
 	HashMap<String, String> replacements;
@@ -26,11 +32,12 @@ public class HtmlCharsCleaner extends Cleaner {
 			for (line = reader.readLine() ; line != null ;
 					line = reader.readLine()) {
 				
-				split = line.split(CountLettersFromFile.TAB);
+				split = line.split("\t");
 				
 				if (split.length != 2) {
 					System.err.println("Error reading HTML chars file: "
-							+ "wrong number of tabs (" + split.length + ").");
+							+ "wrong number of separators "
+							+ "(" + split.length + ").");
 				}
 				if (split[1].length() != 1) {
 					System.err.println("Error reading HTML chars file: "

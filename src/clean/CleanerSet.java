@@ -36,6 +36,7 @@ public class CleanerSet extends ArrayList<Cleaner> {
 		super();
 		
 		try {
+			
 			BufferedReader reader = new BufferedReader(new FileReader(f));
 			
 			String line;
@@ -46,8 +47,11 @@ public class CleanerSet extends ArrayList<Cleaner> {
 				
 				split = line.split("\t");
 				if (split.length != 2) {
+					
 					System.err.println("new CleanerSet(File): there should be "
 							+ "an even number of parameters in each line.");
+					
+					reader.close();
 					return;
 				}
 				
@@ -56,6 +60,7 @@ public class CleanerSet extends ArrayList<Cleaner> {
 			}
 			
 			reader.close();
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -71,7 +76,7 @@ public class CleanerSet extends ArrayList<Cleaner> {
 		}
 	}
 	
-	public String testFile(File f, int nbLines) {
+	public String testFile(File f, int nbLines, Charset encoding) {
 		
 		System.out.println("Testing " + f.getAbsolutePath());
 		
@@ -80,8 +85,7 @@ public class CleanerSet extends ArrayList<Cleaner> {
 		try {
 			InputStreamReader isr = new InputStreamReader(
 					new FileInputStream(f), 
-//					Charset.forName("ISO-8859-1")
-					Charset.defaultCharset()
+					encoding
 					);
 			BufferedReader reader = new BufferedReader(isr);
 			String line;
@@ -119,7 +123,11 @@ public class CleanerSet extends ArrayList<Cleaner> {
 	}
 	
 	public String testFile(File f) {
-		return testFile(f, Integer.MAX_VALUE);
+		return testFile(f, Integer.MAX_VALUE, Charset.defaultCharset());
+	}
+	
+	public String testFile(File f, String encoding) {
+		return testFile(f, Integer.MAX_VALUE, Charset.forName(encoding));
 	}
 	
 }
