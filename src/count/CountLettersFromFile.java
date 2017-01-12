@@ -56,7 +56,7 @@ public class CountLettersFromFile {
 			"^([^<].*[^>])$", "$1", false);
 	
 	/**
-	 * Space before a punctuation mark when there shouldn't be one
+	 * Space before a punctuation mark when there shouldn't be one.
 	 */
 	public static final RegexpCleaner punctuationCleaner1 = new RegexpCleaner(
 			" ([,\\.\\)])", "$1", true);
@@ -86,78 +86,21 @@ public class CountLettersFromFile {
 	public static final String noAccentRegex = "[a-zA-Z]";
 	
 	
-	ArrayList<HashMap<String, Integer>> analyzeInputFileAndUpdate(
-			File[] inputFiles, int maxNGrams, CleanerSet cleanerSet,
-			File[] outputFiles, String outputFileName) {
-		
-		return analyzeInputFileAndUpdate(inputFiles, maxNGrams, cleanerSet, 
-				outputFiles, outputFileName, null);
-		
-	}
+	/* ---------- */
 	
-	/**
-	 * Parses an inputFile to count n-grams (up to maxNGrams) and updates the 
-	 * existing counts in separate outputFiles per n(-grams).
-	 * 
-	 * @param inputFile
-	 * @param maxNGrams
-	 * @param outputFiles
-	 * @return
-	 */
-	@SuppressWarnings("boxing")
-	ArrayList<HashMap<String, Integer>> analyzeInputFileAndUpdate(
-			File[] inputFiles, int maxNGrams, CleanerSet cleanerSet,
-			File[] outputFiles, String outputFileName, String encoding) {
-		
-		ArrayList<HashMap<String, Integer>> count = 
-				new ArrayList<HashMap<String,Integer>>();
-		
-		for (int n = 0 ; n < outputFiles.length ; n++) {
-			
-			count.add(new HashMap<String, Integer>());
-			
-			try {
-				BufferedReader reader = new BufferedReader(
-						new FileReader(outputFiles[n]));
-				
-				String line;
-				for (line = reader.readLine() ; line != null ; 
-						line = reader.readLine()) {
-					
-					String[] split = line.split("[ \t]");
-					
-					count.get(n).put(split[0], Integer.parseInt(split[1]));
-					
-				}
-				
-				reader.close();
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			
-		}
-		
-		return analyzeInputFile(inputFiles, maxNGrams, count, cleanerSet, 
-				outputFileName, encoding);
-		
-	}
-	
-	
-	public ArrayList<HashMap<String, Integer>> analyzeInputFile(
-			File[] inputFiles, int maxNGrams, 
-			ArrayList<HashMap<String, Integer>> _count,
-			CleanerSet cleanerSet, String outputFileName) {
-		
-		return analyzeInputFile(inputFiles, maxNGrams, _count, cleanerSet, 
-				outputFileName, null);
-	}
 	
 	/**
 	 * Parses an inputFile to count n-grams (up to maxNGrams). If _count is 
 	 * null, starts counting from zero for all n-grams. Else, starts from the
 	 * provided counts.
+	 * Specifies an encoding.
+	 * 
+	 * The count structure is as follows:
+	 * count.get(n) is a hashmap linking (n+1)-grams to its # of occurrences.
+	 * So for instance, count.get(1).get("ab") will return the number of times
+	 * "ab" was found in the inputFiles. Remember that to access, say, bigrams,
+	 * the argument of count.get() has to be 2-1=1 since lists indexes start at
+	 * zero. 
 	 * 
 	 * @param inputFile
 	 * @param maxNGrams
@@ -240,10 +183,13 @@ public class CountLettersFromFile {
 								
 //								String nGram = new String(buffer, i-n, n+1);
 								String nGram = line.substring(i-n, i+1);
+//								nGram = nGram.replace(" ", "space");
 								
 								// Excluding tsv-involved characters
-								if (nGram.contains(SEP) 
-										|| nGram.contains(NEWLINE)) {
+								if (
+//										nGram.contains(SEP) 
+//										|| 
+										nGram.contains(NEWLINE)) {
 									continue;
 								}
 								
@@ -344,6 +290,146 @@ public class CountLettersFromFile {
 		
 	}
 	
+	/**
+	 * /**
+	 * Parses an inputFile to count n-grams (up to maxNGrams). If _count is 
+	 * null, starts counting from zero for all n-grams. Else, starts from the
+	 * provided counts.
+	 * Does not specify an encoding.
+	 * 
+	 * The count structure is as follows:
+	 * count.get(n) is a hashmap linking (n+1)-grams to its # of occurrences.
+	 * So for instance, count.get(1).get("ab") will return the number of times
+	 * "ab" was found in the inputFiles. Remember that to access, say, bigrams,
+	 * the argument of count.get() has to be 2-1=1 since lists indexes start at
+	 * zero. 
+	 * 
+	 * @param inputFiles
+	 * @param maxNGrams
+	 * @param _count
+	 * @param cleanerSet
+	 * @param outputFileName
+	 * @return
+	 */
+	public ArrayList<HashMap<String, Integer>> analyzeInputFile(
+			File[] inputFiles, int maxNGrams, 
+			ArrayList<HashMap<String, Integer>> _count,
+			CleanerSet cleanerSet, String outputFileName) {
+		
+		return analyzeInputFile(inputFiles, maxNGrams, _count, cleanerSet, 
+				outputFileName, null);
+	}
+	
+	
+	/**
+	 * Parses an inputFile to count n-grams (up to maxNGrams) and updates the 
+	 * existing counts in separate outputFiles per n(-grams).
+	 * Specifies a character encoding.
+	 * 
+	 * The count structure is as follows:
+	 * count.get(n) is a hashmap linking (n+1)-grams to its # of occurrences.
+	 * So for instance, count.get(1).get("ab") will return the number of times
+	 * "ab" was found in the inputFiles. Remember that to access, say, bigrams,
+	 * the argument of count.get() has to be 2-1=1 since lists indexes start at
+	 * zero.
+	 * 
+	 * @param inputFiles
+	 * @param maxNGrams
+	 * @param cleanerSet
+	 * @param outputFiles
+	 * @param outputFileName
+	 * @param encoding
+	 * @return
+	 */
+	@SuppressWarnings("boxing")
+	ArrayList<HashMap<String, Integer>> analyzeInputFileAndUpdate(
+			File[] inputFiles, int maxNGrams, CleanerSet cleanerSet,
+			File[] outputFiles, String outputFileName, String encoding) {
+		
+		ArrayList<HashMap<String, Integer>> count = 
+				new ArrayList<HashMap<String,Integer>>();
+		
+		for (int n = 0 ; n < outputFiles.length ; n++) {
+			
+			count.add(new HashMap<String, Integer>());
+			
+			try {
+				BufferedReader reader = new BufferedReader(
+						new FileReader(outputFiles[n]));
+				
+				String line;
+				for (line = reader.readLine() ; line != null ; 
+						line = reader.readLine()) {
+					
+					String[] split = line.split("[ \t]");
+					
+					count.get(n).put(split[0], Integer.parseInt(split[1]));
+					
+				}
+				
+				reader.close();
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+		}
+		
+		return analyzeInputFile(inputFiles, maxNGrams, count, cleanerSet, 
+				outputFileName, encoding);
+		
+	}
+	
+	/**
+	 * Parses an inputFile to count n-grams (up to maxNGrams) and updates the 
+	 * existing counts in separate outputFiles per n(-grams).
+	 * Does not specify a character encoding.
+	 * 
+	 * The count structure is as follows:
+	 * count.get(n) is a hashmap linking (n+1)-grams to its # of occurrences.
+	 * So for instance, count.get(1).get("ab") will return the number of times
+	 * "ab" was found in the inputFiles. Remember that to access, say, bigrams,
+	 * the argument of count.get() has to be 2-1=1 since lists indexes start at
+	 * zero.
+	 * 
+	 * @param inputFiles
+	 * @param maxNGrams
+	 * @param cleanerSet
+	 * @param outputFiles
+	 * @param outputFileName
+	 * @param encoding
+	 * @return
+	 */
+	ArrayList<HashMap<String, Integer>> analyzeInputFileAndUpdate(
+			File[] inputFiles, int maxNGrams, CleanerSet cleanerSet,
+			File[] outputFiles, String outputFileName) {
+		
+		return analyzeInputFileAndUpdate(inputFiles, maxNGrams, cleanerSet, 
+				outputFiles, outputFileName, null);
+		
+	}
+	
+	
+	/**
+	 * Replaces special characters by their textual representation, e.g. " "
+	 * becoomes "space".
+	 * 
+	 * @param c
+	 * @return
+	 */
+	static public String replaceSpecChars(String c) {
+		return c.replaceAll("\t", "tab")
+				.replaceAll("\n", "return")
+				.replaceAll(" ", "space");
+	}
+	
+	/**
+	 * Applies replaceSpecChars() to a String.
+	 * 
+	 * @param _key
+	 * @return
+	 */
 	static public String format(String _key) {
 		
 		if (_key.length() == 0) {
@@ -352,6 +438,7 @@ public class CountLettersFromFile {
 		}
 		
 		// 1st check if it's the right length or if it's already been formatted
+		
 		if ( _key.length() > 2 ) {
 			return _key;
 		}
@@ -362,9 +449,7 @@ public class CountLettersFromFile {
 		for (int i = 0 ; i < _key.length() ; i++) {
 			keyArray[i] = ""+_key.toCharArray()[i];
 			
-			keyArray[i] = keyArray[i].replaceAll("\t", "tab");
-			keyArray[i] = keyArray[i].replaceAll("\n", "return");
-			keyArray[i] = keyArray[i].replaceAll(" ", "space");
+			keyArray[i] = replaceSpecChars(keyArray[i]);
 			
 			key += keyArray[i];
 			if (i < _key.length()-1) {
@@ -372,12 +457,19 @@ public class CountLettersFromFile {
 			}
 		}
 		
+//		if (key.contains("space")) {
+//			System.out.println("Format " + _key + " into " + key);
+//		}
+		
 		return key;
 	}
 	
 	/**
-	 * Reads n-gram counts from an input file and calculates the corresponding
-	 * frequencies, and writes them in a new file.
+	 * Reads n-gram counts from a set of input files and calculates the 
+	 * corresponding frequencies, and writes them in a new file.
+	 * 
+	 * countFiles is a set of keys and number of occurrences, as is output by
+	 * analyzeInputFileAndUpdate().
 	 * 
 	 * @param countFiles
 	 */
@@ -406,17 +498,100 @@ public class CountLettersFromFile {
 						new HashMap<String, Long>();
 				
 				
-				String line;
+				String line = reader.readLine();
+//				String sep = ""+line.charAt(1); // ??
+				Pattern p = Pattern.compile("([^\\d])\\d+$");
+				Matcher m = p.matcher(line);
+				m.find();
+				String sep = m.group(1);
 				
-				for (line = reader.readLine() ; line != null ; 
+				for ( ; line != null ; 
 						line = reader.readLine()) {
 					
-					String[] split = line.split("\t");
+					String[] split = line.split(sep);
 					
-					long count = Long.parseLong(split[1]);
-					counts.put(split[0], count);
+//					if (split.length == 1) {
+//						System.err.print(
+//								file + ":\t"
+//								+ "Wrong size for split: " + split.length
+//								+ "(separator ");
+//						if (sep.equalsIgnoreCase(" ")) {
+//							System.err.println("[space] )");
+//						} else if (sep.equalsIgnoreCase("\t")) {
+//							System.err.println("[tab] )");
+//						} else {
+//							System.err.println(sep + " )");
+//						}
+//						System.err.print("\t");
+//						for (String s : split) {
+//							System.err.print(s + "\t");
+//						}
+//						System.err.println();
+//						continue;
+//					}
+					
+					long count = Long.parseLong(split[split.length-1].trim());
+					
+					// Last thing I did: construct key instead of split[0]
+					String key = "";
+					
+					if (split.length == 3) {
+						
+						key = replaceSpecChars(split[0]) + " " 
+								+ replaceSpecChars(split[1]);
+						
+					} else if (split.length == 2) {
+						
+						if (split[0].length() == 1 
+								|| split[0].equalsIgnoreCase("space")) {
+							
+							key = replaceSpecChars(split[0]);
+							
+						} else if (split[0].length() > 1) {
+							
+							if (split[0].matches("[^\\s]\\s?space")) {
+								
+								key = split[0].charAt(0) + " space";
+								
+							} else if (split[0].matches("space\\s?[^\\s]")) {
+								
+								key = "space " 
+										+ split[0].charAt(split[0].length()-1);
+								
+							} else if (split[0].length() == 2
+									|| split[0].matches("[^\\s]\\s?[^\\s]")) {
+								
+								key = replaceSpecChars(""+split[0].charAt(0)) 
+										+ " " 
+										+ replaceSpecChars(
+												"" + split[0].charAt(
+														split[0].length()-1));
+										
+							} else {
+								System.err.println(
+										"Something wrong with split[0]: " 
+										+ split[0]);
+							}
+							
+						} else {
+							System.err.println("split[0] seems to be empty: "
+									+ split[0]);
+						}
+						
+					} else {
+						System.err.println("Something weird with split. Line: "
+								+ line);
+					}
+//					
+//					for (int i = 0 ; i < split.length-1 ; i++) {
+//						System.out.println(split[i]);
+//						key += split[i] + " ";
+//					}
+//					key = key.trim();
+//					System.out.println("\tConstructed " + key);
+					
+					counts.put(key, count);
 					sum += count;
-					
 					nbLines++;
 					
 				}
@@ -437,7 +612,8 @@ public class CountLettersFromFile {
 					}
 				});
 				
-				System.out.println(orderedKeys.size() + " ?= " + counts.keySet().size());				
+				System.out.println(orderedKeys.size() + " ?= " 
+						+ counts.keySet().size());				
 				
 				BufferedWriter writer = new BufferedWriter(new FileWriter(
 						outputFileName));
@@ -522,11 +698,15 @@ public class CountLettersFromFile {
 			}
 			
 		}
-		
-		
-		
 	}
 	
+	/**
+	 * TODO 
+	 * 
+	 * @param probas
+	 * @param ignoreAlpha
+	 * @return
+	 */
 	public ArrayList<HashMap<String, HashMap<String, Double>>> 
 			calculateDistances( 
 					TreeMap<String, HashMap<String, Double>> probas,
