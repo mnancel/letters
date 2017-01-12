@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import clean.CapsCleaner;
@@ -362,11 +363,39 @@ public class Main {
 	 *  
 	 *  One line per tweet.
 	 *  Excluding RT prefixes.
+	 *  NEW: excluding 3/4 of URLs
 	 */
-	static void doTwitter(CountLettersFromFile clf, int nbGrams) {
+	static void doTwitter(CountLettersFromFile clf, int nbGrams, 
+			final int keep_, final int reset_) {
+		
 		File twitterFolders[] = { 
 				new File("/Volumes/Uranium/Twitter/TwitterPop"),
 				new File("/Volumes/Uranium/Twitter/TwitterClassic") };
+		
+		RegexpCleaner rtCleaner = new RegexpCleaner(
+				"^RT [^:]+: ", "", true);
+		
+		RegexpCleaner urlFilter = new RegexpCleaner(
+				"(((\\w+://)|(\\w+\\.))(\\w+\\.)+"
+				+ "\\p{L}\\p{L}\\p{L}?\\p{L}?[^\\s]*)", 
+				"", true) {
+			
+			int nbTests = -1;
+			
+			@Override
+			public String test(String s) {
+				
+				nbTests = (nbTests+1) % reset_;
+				
+				if (nbTests < keep_) {
+					return s;
+				} 
+				
+				return super.test(s);
+				
+			}
+			
+		};
 		
 		for (int i = 0 ; i < twitterFolders.length ; i++) {
 		
@@ -383,11 +412,9 @@ public class Main {
 			
 			fileListTwitter = tFiles.toArray(new File[0]);
 			
-			RegexpCleaner rtCleaner = new RegexpCleaner(
-					"^RT [^:]+: ", "", true);
-			
 			CleanerSet twitterCleaners = new CleanerSet(
-					rtCleaner
+					rtCleaner,
+					urlFilter
 			);
 			
 	//		System.out.println(twitterCleaners.testFile(fileListTwitter[2]));
@@ -598,7 +625,7 @@ public class Main {
 //		doW0015(clf, nbGrams);
 //		doEstRep(clf, nbGrams);
 //		doWikipedia(clf, nbGrams);
-//		doTwitter(clf, nbGrams);
+//		doTwitter(clf, nbGrams, 1, 4);
 //		doEasyEMails(clf, nbGrams);
 //		doEster(clf, nbGrams);
 //		doCode(clf, nbGrams);
@@ -622,7 +649,8 @@ public class Main {
 		excludes.add("distances");	// excluding distances folder
 		excludes.add("Est Républicain");
 		
-		File[] countFiles = new File("results/").listFiles(new FilenameFilter() {
+		File[] countFiles = 
+				new File("results/").listFiles(new FilenameFilter() {
 			
 			public boolean accept(File dir, String name) {
 				boolean keep = !name.startsWith(".") && name.endsWith(".tsv");
@@ -707,19 +735,25 @@ public class Main {
 					BufferedReader reader = new BufferedReader(
 							new FileReader(f) );
 					
-					String line;
+					String line = reader.readLine();
+					
+					Pattern p = Pattern.compile("([^\\d])\\d+$");
+					Matcher m = p.matcher(line);
+					m.find();
+					String sep = m.group(1);
+
 					String[] split;
 					long num;
 					
-					for (line = reader.readLine() ; line != null ; 
+					for ( ; line != null ; 
 							line = reader.readLine()) {
 						
-						split = line.split("\t");
-						num = Long.parseLong(split[1]);
+						split = line.split(sep);
+						num = Long.parseLong(split[split.length-1]);
 						
 						if (currentCount.containsKey(split[0])) {
-							currentCount.put(split[0], currentCount.get(split[0]) 
-									+ num );
+							currentCount.put(split[0], 
+									currentCount.get(split[0]) + num );
 						} else {
 							currentCount.put(split[0], num );
 						}
@@ -909,13 +943,13 @@ public class Main {
 				});
 				
 				for (String k1 : keys_1) {
-					writerAvg_1.write( format(k1) + SEP + (1d*sum_1.get(k1)/a_1) 
+					writerAvg_1.write( format(k1) + SEP + (1d*sum_1.get(k1)/a_1)
 							+ NEWLINE);
 					frequenciesTotal_1 += (1d*sum_1.get(k1)/a_1);
 				}
 				
 				for (String k2 : keys_2) {
-					writerAvg_2.write( format(k2) + SEP + (1d*sum_2.get(k2)/a_2) 
+					writerAvg_2.write( format(k2) + SEP + (1d*sum_2.get(k2)/a_2)
 							+ NEWLINE);
 					frequenciesTotal_2 += (1d*sum_2.get(k2)/a_2);
 				}

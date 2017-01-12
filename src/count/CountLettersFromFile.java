@@ -240,10 +240,13 @@ public class CountLettersFromFile {
 								
 //								String nGram = new String(buffer, i-n, n+1);
 								String nGram = line.substring(i-n, i+1);
+//								nGram = nGram.replace(" ", "space");
 								
 								// Excluding tsv-involved characters
-								if (nGram.contains(SEP) 
-										|| nGram.contains(NEWLINE)) {
+								if (
+//										nGram.contains(SEP) 
+//										|| 
+										nGram.contains(NEWLINE)) {
 									continue;
 								}
 								
@@ -344,6 +347,12 @@ public class CountLettersFromFile {
 		
 	}
 	
+	static public String replaceSpecChars(String c) {
+		return c.replaceAll("\t", "tab")
+				.replaceAll("\n", "return")
+				.replaceAll(" ", "space");
+	}
+	
 	static public String format(String _key) {
 		
 		if (_key.length() == 0) {
@@ -362,15 +371,17 @@ public class CountLettersFromFile {
 		for (int i = 0 ; i < _key.length() ; i++) {
 			keyArray[i] = ""+_key.toCharArray()[i];
 			
-			keyArray[i] = keyArray[i].replaceAll("\t", "tab");
-			keyArray[i] = keyArray[i].replaceAll("\n", "return");
-			keyArray[i] = keyArray[i].replaceAll(" ", "space");
+			keyArray[i] = replaceSpecChars(keyArray[i]);
 			
 			key += keyArray[i];
 			if (i < _key.length()-1) {
 				key += " ";
 			}
 		}
+		
+//		if (key.contains("space")) {
+//			System.out.println("Format " + _key + " into " + key);
+//		}
 		
 		return key;
 	}
@@ -406,17 +417,100 @@ public class CountLettersFromFile {
 						new HashMap<String, Long>();
 				
 				
-				String line;
+				String line = reader.readLine();
+//				String sep = ""+line.charAt(1); // ??
+				Pattern p = Pattern.compile("([^\\d])\\d+$");
+				Matcher m = p.matcher(line);
+				m.find();
+				String sep = m.group(1);
 				
-				for (line = reader.readLine() ; line != null ; 
+				for ( ; line != null ; 
 						line = reader.readLine()) {
 					
-					String[] split = line.split("\t");
+					String[] split = line.split(sep);
 					
-					long count = Long.parseLong(split[1]);
-					counts.put(split[0], count);
+//					if (split.length == 1) {
+//						System.err.print(
+//								file + ":\t"
+//								+ "Wrong size for split: " + split.length
+//								+ "(separator ");
+//						if (sep.equalsIgnoreCase(" ")) {
+//							System.err.println("[space] )");
+//						} else if (sep.equalsIgnoreCase("\t")) {
+//							System.err.println("[tab] )");
+//						} else {
+//							System.err.println(sep + " )");
+//						}
+//						System.err.print("\t");
+//						for (String s : split) {
+//							System.err.print(s + "\t");
+//						}
+//						System.err.println();
+//						continue;
+//					}
+					
+					long count = Long.parseLong(split[split.length-1].trim());
+					
+					// Last thing I did: construct key instead of split[0]
+					String key = "";
+					
+					if (split.length == 3) {
+						
+						key = replaceSpecChars(split[0]) + " " 
+								+ replaceSpecChars(split[1]);
+						
+					} else if (split.length == 2) {
+						
+						if (split[0].length() == 1 
+								|| split[0].equalsIgnoreCase("space")) {
+							
+							key = replaceSpecChars(split[0]);
+							
+						} else if (split[0].length() > 1) {
+							
+							if (split[0].matches("[^\\s]\\s?space")) {
+								
+								key = split[0].charAt(0) + " space";
+								
+							} else if (split[0].matches("space\\s?[^\\s]")) {
+								
+								key = "space " 
+										+ split[0].charAt(split[0].length()-1);
+								
+							} else if (split[0].length() == 2
+									|| split[0].matches("[^\\s]\\s?[^\\s]")) {
+								
+								key = replaceSpecChars(""+split[0].charAt(0)) 
+										+ " " 
+										+ replaceSpecChars(
+												"" + split[0].charAt(
+														split[0].length()-1));
+										
+							} else {
+								System.err.println(
+										"Something wrong with split[0]: " 
+										+ split[0]);
+							}
+							
+						} else {
+							System.err.println("split[0] seems to be empty: "
+									+ split[0]);
+						}
+						
+					} else {
+						System.err.println("Something weird with split. Line: "
+								+ line);
+					}
+//					
+//					for (int i = 0 ; i < split.length-1 ; i++) {
+//						System.out.println(split[i]);
+//						key += split[i] + " ";
+//					}
+//					key = key.trim();
+//					System.out.println("\tConstructed " + key);
+					
+					counts.put(key, count);
 					sum += count;
-					
 					nbLines++;
 					
 				}
@@ -437,7 +531,8 @@ public class CountLettersFromFile {
 					}
 				});
 				
-				System.out.println(orderedKeys.size() + " ?= " + counts.keySet().size());				
+				System.out.println(orderedKeys.size() + " ?= " 
+						+ counts.keySet().size());				
 				
 				BufferedWriter writer = new BufferedWriter(new FileWriter(
 						outputFileName));
