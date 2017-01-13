@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import clean.CapsCleaner;
@@ -37,7 +38,8 @@ import count.CountLettersFromFile;
 
 public class Main {
 	
-	
+	static final String ROOT = "/Volumes/Porsche Trunk/French Revolution/"; 
+	// /Volumes/Uranium/; 
 	
 	/**
 	 *  W0057
@@ -45,7 +47,7 @@ public class Main {
 	 *  No change needed.
 	 */
 	static void doW0057(CountLettersFromFile clf, int nbGrams) {
-		File w0057Folder = new File("/Volumes/Uranium/ELDA/W0057");
+		File w0057Folder = new File(ROOT + "ELDA/W0057");
 		File[] fileListW0057 = w0057Folder.listFiles(new FileFilter() {
 			
 			public boolean accept(File pathname) {
@@ -65,7 +67,7 @@ public class Main {
 	 *  No change needed.
 	 */
 	static void doW0058(CountLettersFromFile clf, int nbGrams) {
-		File w0058Folder = new File("/Volumes/Uranium/ELDA/W0058");
+		File w0058Folder = new File(ROOT + "ELDA/W0058");
 		File[] fileListW0058 = w0058Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(".fr");
@@ -85,7 +87,7 @@ public class Main {
 	 *  Need to keep only the <p> content.
 	 */
 	static void doW0065(CountLettersFromFile clf, int nbGrams) {
-		File w0065Folder = new File("/Volumes/Uranium/ELDA/W0065/ENV_FR");
+		File w0065Folder = new File(ROOT + "ELDA/W0065/ENV_FR");
 		File[] fileListW0065 = w0065Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(".xml");
@@ -110,7 +112,7 @@ public class Main {
 	 *  Same as W0065
 	 */
 	static void doW0066(CountLettersFromFile clf, int nbGrams) {
-		File w0066Folder = new File("/Volumes/Uranium/ELDA/W0066/LAB_FR");
+		File w0066Folder = new File(ROOT + "ELDA/W0066/LAB_FR");
 		File[] fileListW0066 = w0066Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
 				return pathname.getName().endsWith(".xml");
@@ -137,7 +139,7 @@ public class Main {
 	 */
 	static void doW0017(CountLettersFromFile clf, int nbGrams) {
 		File w0017Folder = new File(
-				"/Volumes/Uranium/ELDA/W0017/Data/FR/Sentences");
+				ROOT + "ELDA/W0017/Data/FR/Sentences");
 		File[] fileListW0017 = w0017Folder.listFiles();
 
 		CleanerSet w0017Cleaners = new CleanerSet(
@@ -150,7 +152,7 @@ public class Main {
 
 		clf.analyzeInputFile(fileListW0017, nbGrams, null, w0017Cleaners, 
 				"W0017", "ISO-8859-1");
-}
+	}
 	
 	
 	
@@ -163,7 +165,7 @@ public class Main {
 	 */
 	static void doW0036(CountLettersFromFile clf, int nbGrams) {
 		File w0036Folder = new File(
-				"/Volumes/Uranium/ELDA/W0036-01");
+				ROOT + "ELDA/W0036-01");
 		File[] fileListW0036;
 		ArrayList<File> files = new ArrayList<File>();
 		
@@ -217,7 +219,7 @@ public class Main {
 	 */
 	static void doW0015(CountLettersFromFile clf, int nbGrams) {
 		File w0015Folder = new File(
-				"/Volumes/Uranium/ELDA/W0015");
+				ROOT + "ELDA/W0015");
 		File[] fileListW0015;
 		ArrayList<File> files = new ArrayList<File>();
 		
@@ -273,7 +275,7 @@ public class Main {
 	 */
 	static void doEstRep(CountLettersFromFile clf, int nbGrams) {
 		File w00EstFolder = new File(
-				"/Volumes/Uranium/Est Républicain");
+				ROOT + "Est Républicain");
 		File[] fileListEst;
 		ArrayList<File> files = new ArrayList<File>();
 		
@@ -321,7 +323,7 @@ public class Main {
 	 */
 	static void doWikipedia(CountLettersFromFile clf, int nbGrams) {
 		File wikiFolder = new File(
-				"/Volumes/Uranium/wikipedia.txt.dump.20140608-fr.SZTAKI/");
+				ROOT + "wikipedia.txt.dump.20140608-fr.SZTAKI/");
 		
 		File[] fileListWiki = wikiFolder.listFiles(new FilenameFilter() {
 			
@@ -362,11 +364,39 @@ public class Main {
 	 *  
 	 *  One line per tweet.
 	 *  Excluding RT prefixes.
+	 *  NEW: excluding 3/4 of URLs
 	 */
-	static void doTwitter(CountLettersFromFile clf, int nbGrams) {
+	static void doTwitter(CountLettersFromFile clf, int nbGrams, 
+			final int keep_, final int reset_) {
+		
 		File twitterFolders[] = { 
-				new File("/Volumes/Uranium/Twitter/TwitterPop"),
-				new File("/Volumes/Uranium/Twitter/TwitterClassic") };
+				new File(ROOT + "Twitter/TwitterPop"),
+				new File(ROOT + "Twitter/TwitterClassic") };
+		
+		RegexpCleaner rtCleaner = new RegexpCleaner(
+				"^RT [^:]+: ", "", true);
+		
+		RegexpCleaner urlFilter = new RegexpCleaner(
+				"(((\\w+://)|(\\w+\\.))(\\w+\\.)+"
+				+ "\\p{L}\\p{L}\\p{L}?\\p{L}?[^\\s]*)", 
+				"", true) {
+			
+			int nbTests = -1;
+			
+			@Override
+			public String test(String s) {
+				
+				nbTests = (nbTests+1) % reset_;
+				
+				if (nbTests < keep_) {
+					return s;
+				} 
+				
+				return super.test(s);
+				
+			}
+			
+		};
 		
 		for (int i = 0 ; i < twitterFolders.length ; i++) {
 		
@@ -383,11 +413,9 @@ public class Main {
 			
 			fileListTwitter = tFiles.toArray(new File[0]);
 			
-			RegexpCleaner rtCleaner = new RegexpCleaner(
-					"^RT [^:]+: ", "", true);
-			
 			CleanerSet twitterCleaners = new CleanerSet(
-					rtCleaner
+					rtCleaner,
+					urlFilter
 			);
 			
 	//		System.out.println(twitterCleaners.testFile(fileListTwitter[2]));
@@ -405,7 +433,7 @@ public class Main {
 	 *  Excluding "doc" markups.
 	 */
 	static void doEasyEMails(CountLettersFromFile clf, int nbGrams) {
-		File easyFolder = new File("/Volumes/Uranium/ELDA 2/E0034_Easy");
+		File easyFolder = new File(ROOT + "ELDA 2/E0034_Easy");
 		
 		File[] fileListEasy = easyFolder.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
@@ -435,8 +463,8 @@ public class Main {
 	 */
 	static void doEster(CountLettersFromFile clf, int nbGrams) {
 		File esterFolder[] = {
-				new File("/Volumes/Uranium/ELDA 2/S0241_Ester"),
-				new File("/Volumes/Uranium/ELDA 2/S0338_Ester 2")
+				new File(ROOT + "ELDA 2/S0241_Ester"),
+				new File(ROOT + "ELDA 2/S0338_Ester 2")
 		};
 
 		
@@ -512,7 +540,7 @@ public class Main {
 		
 		
 		File codeMainFolder = 
-				new File("/Volumes/Uranium/CODECRAWL");
+				new File(ROOT + "CODECRAWL");
 		
 		File[] languageFolders = codeMainFolder.listFiles(
 				new FileFilter() {
@@ -581,6 +609,41 @@ public class Main {
 		
 	}
 	
+	/**
+	 *  HTML examples
+	 *  
+	 *  HTML format with some HTML codes.
+	 */
+	static void doHtml(CountLettersFromFile clf, int nbGrams) {
+		File htmlFolder = new File(
+				ROOT + "websites");
+		File[] fileListHtml = htmlFolder.listFiles();
+
+		CleanerSet htmlCleaners = new CleanerSet(htmlCharsCleaner);
+
+//			System.out.println(htmlCleaners.testFile(fileListHtml[1]));
+
+		clf.analyzeInputFile(fileListHtml, nbGrams, null, htmlCleaners, "HTML");
+	}
+	
+	/**
+	 *  Facebook examples
+	 *  
+	 *  Simple text format.
+	 */
+	static void doFacebook(CountLettersFromFile clf, int nbGrams) {
+		File facebookFolder = new File(
+				ROOT + "facebook_statuses");
+		File[] fileListFacebook = facebookFolder.listFiles();
+
+		CleanerSet facebookCleaners = new CleanerSet();
+
+//			System.out.println(htmlCleaners.testFile(fileListHtml[1]));
+
+		clf.analyzeInputFile(fileListFacebook, nbGrams, null, facebookCleaners, 
+				"Facebook");
+	}
+	
 	
 	
 	@SuppressWarnings("boxing")
@@ -598,10 +661,12 @@ public class Main {
 //		doW0015(clf, nbGrams);
 //		doEstRep(clf, nbGrams);
 //		doWikipedia(clf, nbGrams);
-//		doTwitter(clf, nbGrams);
+//		doTwitter(clf, nbGrams, 1, 4);
 //		doEasyEMails(clf, nbGrams);
 //		doEster(clf, nbGrams);
 //		doCode(clf, nbGrams);
+//		doHtml(clf, nbGrams);
+//		doFacebook(clf, nbGrams);
 		
 		System.out.println();
 
@@ -622,7 +687,8 @@ public class Main {
 		excludes.add("distances");	// excluding distances folder
 		excludes.add("Est Républicain");
 		
-		File[] countFiles = new File("results/").listFiles(new FilenameFilter() {
+		File[] countFiles = 
+				new File("results/").listFiles(new FilenameFilter() {
 			
 			public boolean accept(File dir, String name) {
 				boolean keep = !name.startsWith(".") && name.endsWith(".tsv");
@@ -668,10 +734,13 @@ public class Main {
 		for (File f : countFiles) {
 			if (tweetPattern.matcher(f.getName()).find()) {
 				countGroups.get("Twitter").add(f);
+				System.out.println("Added " + f.getName() + " to Twitter");
 			} else if (codePattern.matcher(f.getName()).find()) {
 				countGroups.get("Code").add(f);
+				System.out.println("Added " + f.getName() + " to Code");
 			} else {
 				countGroups.get("Formals").add(f);
+				System.out.println("Added " + f.getName() + " to Formals");
 			}
 		}
 		
@@ -707,19 +776,25 @@ public class Main {
 					BufferedReader reader = new BufferedReader(
 							new FileReader(f) );
 					
-					String line;
+					String line = reader.readLine();
+					
+					Pattern p = Pattern.compile("([^\\d])\\d+$");
+					Matcher m = p.matcher(line);
+					m.find();
+					String sep = m.group(1);
+
 					String[] split;
 					long num;
 					
-					for (line = reader.readLine() ; line != null ; 
+					for ( ; line != null ; 
 							line = reader.readLine()) {
 						
-						split = line.split("\t");
-						num = Long.parseLong(split[1]);
+						split = line.split(sep);
+						num = Long.parseLong(split[split.length-1]);
 						
 						if (currentCount.containsKey(split[0])) {
-							currentCount.put(split[0], currentCount.get(split[0]) 
-									+ num );
+							currentCount.put(split[0], 
+									currentCount.get(split[0]) + num );
 						} else {
 							currentCount.put(split[0], num );
 						}
@@ -909,13 +984,13 @@ public class Main {
 				});
 				
 				for (String k1 : keys_1) {
-					writerAvg_1.write( format(k1) + SEP + (1d*sum_1.get(k1)/a_1) 
+					writerAvg_1.write( format(k1) + SEP + (1d*sum_1.get(k1)/a_1)
 							+ NEWLINE);
 					frequenciesTotal_1 += (1d*sum_1.get(k1)/a_1);
 				}
 				
 				for (String k2 : keys_2) {
-					writerAvg_2.write( format(k2) + SEP + (1d*sum_2.get(k2)/a_2) 
+					writerAvg_2.write( format(k2) + SEP + (1d*sum_2.get(k2)/a_2)
 							+ NEWLINE);
 					frequenciesTotal_2 += (1d*sum_2.get(k2)/a_2);
 				}
