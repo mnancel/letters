@@ -28,7 +28,7 @@ import clean.CleanerSet;
 import clean.HtmlCharsCleaner;
 import clean.RegexpCleaner;
 
-public class CountLettersFromFile {
+public class LetterCounter {
 	
 	public static final String RESULTS_FOLDER = "results";
 	
@@ -291,7 +291,6 @@ public class CountLettersFromFile {
 	}
 	
 	/**
-	 * /**
 	 * Parses an inputFile to count n-grams (up to maxNGrams). If _count is 
 	 * null, starts counting from zero for all n-grams. Else, starts from the
 	 * provided counts.

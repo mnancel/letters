@@ -1,31 +1,22 @@
 package run;
 
-import static count.LetterCounter.MarkupCleaner;
-import static count.LetterCounter.SEP;
-import static count.LetterCounter.NEWLINE;
-import static count.LetterCounter.htmlCharsCleaner;
-import static count.LetterCounter.pCleaner;
-import static count.LetterCounter.punctuationCleaner1;
-import static count.LetterCounter.punctuationCleaner2;
-import static count.LetterCounter.punctuationCleaner3;
-import static count.LetterCounter.punctuationCleaner4;
-import static count.LetterCounter.format;
+import static count.CountLettersFromFile.MarkupCleaner;
+import static count.CountLettersFromFile.htmlCharsCleaner;
+import static count.CountLettersFromFile.pCleaner;
+import static count.CountLettersFromFile.punctuationCleaner1;
+import static count.CountLettersFromFile.punctuationCleaner2;
+import static count.CountLettersFromFile.punctuationCleaner3;
+import static count.CountLettersFromFile.punctuationCleaner4;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,19 +25,18 @@ import clean.Cleaner;
 import clean.CleanerSet;
 import clean.MultiLineCommentCleaner;
 import clean.RegexpCleaner;
-import count.LetterCounter;
+import count.CountLettersFromFile;
 
-public class AFNOR {
+public class CountForPaper {
 	
 	static final String ROOT = "/Volumes/Porsche Trunk/French Revolution/"; 
-	// /Volumes/Uranium/; 
 	
 	/**
 	 *  W0057
 	 *  
 	 *  No change needed.
 	 */
-	static void doW0057(LetterCounter clf, int nbGrams) {
+	static void doW0057(CountLettersFromFile clf, int nbGrams) {
 		File w0057Folder = new File(ROOT + "ELDA/W0057");
 		File[] fileListW0057 = w0057Folder.listFiles(new FileFilter() {
 			
@@ -66,7 +56,7 @@ public class AFNOR {
 	 *  
 	 *  No change needed.
 	 */
-	static void doW0058(LetterCounter clf, int nbGrams) {
+	static void doW0058(CountLettersFromFile clf, int nbGrams) {
 		File w0058Folder = new File(ROOT + "ELDA/W0058");
 		File[] fileListW0058 = w0058Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
@@ -86,7 +76,7 @@ public class AFNOR {
 	 *  XML format with some spacing issues with the punctuation.
 	 *  Need to keep only the <p> content.
 	 */
-	static void doW0065(LetterCounter clf, int nbGrams) {
+	static void doW0065(CountLettersFromFile clf, int nbGrams) {
 		File w0065Folder = new File(ROOT + "ELDA/W0065/ENV_FR");
 		File[] fileListW0065 = w0065Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
@@ -111,7 +101,7 @@ public class AFNOR {
 	 *  
 	 *  Same as W0065
 	 */
-	static void doW0066(LetterCounter clf, int nbGrams) {
+	static void doW0066(CountLettersFromFile clf, int nbGrams) {
 		File w0066Folder = new File(ROOT + "ELDA/W0066/LAB_FR");
 		File[] fileListW0066 = w0066Folder.listFiles(new FileFilter() {
 			public boolean accept(File pathname) {
@@ -137,7 +127,7 @@ public class AFNOR {
 	 *  XML format with some HTML codes and an "ISO-8859-1" encoding
 	 *  Need to keep only the lines with no xml markups, apparently.
 	 */
-	static void doW0017(LetterCounter clf, int nbGrams) {
+	static void doW0017(CountLettersFromFile clf, int nbGrams) {
 		File w0017Folder = new File(
 				ROOT + "ELDA/W0017/Data/FR/Sentences");
 		File[] fileListW0017 = w0017Folder.listFiles();
@@ -163,7 +153,7 @@ public class AFNOR {
 	 *  Article bodies seem contained within "<p>".
 	 *  Trusting them for the spaces around punctuation.
 	 */
-	static void doW0036(LetterCounter clf, int nbGrams) {
+	static void doW0036(CountLettersFromFile clf, int nbGrams) {
 		File w0036Folder = new File(
 				ROOT + "ELDA/W0036-01");
 		File[] fileListW0036;
@@ -217,7 +207,7 @@ public class AFNOR {
 	 *  Article bodies seem contained within "<p>".
 	 *  Trusting them for the spaces around punctuation.
 	 */
-	static void doW0015(LetterCounter clf, int nbGrams) {
+	static void doW0015(CountLettersFromFile clf, int nbGrams) {
 		File w0015Folder = new File(
 				ROOT + "ELDA/W0015");
 		File[] fileListW0015;
@@ -273,7 +263,7 @@ public class AFNOR {
 	 *  Article bodies seem contained within "<p>".
 	 *  Trusting them for the spaces around punctuation.
 	 */
-	static void doEstRep(LetterCounter clf, int nbGrams) {
+	static void doEstRep(CountLettersFromFile clf, int nbGrams) {
 		File w00EstFolder = new File(
 				ROOT + "Est Républicain");
 		File[] fileListEst;
@@ -321,7 +311,7 @@ public class AFNOR {
 	 *  Wiki format with some bad removals that cause weird spacing around 
 	 *  punctuation.
 	 */
-	static void doWikipedia(LetterCounter clf, int nbGrams) {
+	static void doWikipedia(CountLettersFromFile clf, int nbGrams) {
 		File wikiFolder = new File(
 				ROOT + "wikipedia.txt.dump.20140608-fr.SZTAKI/");
 		
@@ -366,7 +356,7 @@ public class AFNOR {
 	 *  Excluding RT prefixes.
 	 *  NEW: excluding 3/4 of URLs
 	 */
-	static void doTwitter(LetterCounter clf, int nbGrams, 
+	static void doTwitter(CountLettersFromFile clf, int nbGrams, 
 			final int keep_, final int reset_) {
 		
 		File twitterFolders[] = { 
@@ -398,30 +388,30 @@ public class AFNOR {
 			
 		};
 		
-//		RegexpCleaner rtCleaner = new RegexpCleaner(
-//				"^RT [^:]+: ", "", true);
-//		
-//		RegexpCleaner urlFilter = new RegexpCleaner(
-//				"(((\\w+://)|(\\w+\\.))(\\w+\\.)+"
-//				+ "\\p{L}\\p{L}\\p{L}?\\p{L}?[^\\s]*)", 
-//				"", true) {
-//			
-//			int nbTests = -1;
-//			
-//			@Override
-//			public String test(String s) {
-//				
-//				nbTests = (nbTests+1) % reset_;
-//				
-//				if (nbTests < keep_) {
-//					return s;
-//				} 
-//				
-//				return super.test(s);
-//				
-//			}
-//			
-//		};
+		rtCleaner = new RegexpCleaner(
+				"^RT [^:]+: ", "", true);
+		
+		urlFilter = new RegexpCleaner(
+				"(((\\w+://)|(\\w+\\.))(\\w+\\.)+"
+				+ "\\p{L}\\p{L}\\p{L}?\\p{L}?[^\\s]*)", 
+				"", true) {
+			
+			int nbTests = -1;
+			
+			@Override
+			public String test(String s) {
+				
+				nbTests = (nbTests+1) % reset_;
+				
+				if (nbTests < keep_) {
+					return s;
+				} 
+				
+				return super.test(s);
+				
+			}
+			
+		};
 		
 		for (int i = 0 ; i < twitterFolders.length ; i++) {
 		
@@ -457,7 +447,7 @@ public class AFNOR {
 	 *  
 	 *  Excluding "doc" markups.
 	 */
-	static void doEasyEMails(LetterCounter clf, int nbGrams) {
+	static void doEasyEMails(CountLettersFromFile clf, int nbGrams) {
 		File easyFolder = new File(ROOT + "ELDA 2/E0034_Easy");
 		
 		File[] fileListEasy = easyFolder.listFiles(new FilenameFilter() {
@@ -486,7 +476,7 @@ public class AFNOR {
 	 *  
 	 *  Excluding "doc" markups.
 	 */
-	static void doEster(LetterCounter clf, int nbGrams) {
+	static void doEster(CountLettersFromFile clf, int nbGrams) {
 		File esterFolder[] = {
 				new File(ROOT + "ELDA 2/S0241_Ester"),
 				new File(ROOT + "ELDA 2/S0338_Ester 2")
@@ -541,7 +531,7 @@ public class AFNOR {
 	 *  
 	 *  Excluding comments.
 	 */
-	static void doCode(LetterCounter clf, int nbGrams) {
+	static void doCode(CountLettersFromFile clf, int nbGrams) {
 		
 		// "// Comment"
 		Cleaner cJavaJsCssCleaner1 = new RegexpCleaner(
@@ -639,7 +629,7 @@ public class AFNOR {
 	 *  
 	 *  HTML format with some HTML codes.
 	 */
-	static void doHtml(LetterCounter clf, int nbGrams) {
+	static void doHtml(CountLettersFromFile clf, int nbGrams) {
 		File htmlFolder = new File(
 				ROOT + "websites");
 		File[] fileListHtml = htmlFolder.listFiles();
@@ -656,7 +646,7 @@ public class AFNOR {
 	 *  
 	 *  Simple text format.
 	 */
-	static void doFacebook(LetterCounter clf, int nbGrams) {
+	static void doFacebook(CountLettersFromFile clf, int nbGrams) {
 		File facebookFolder = new File(
 				ROOT + "facebook_statuses");
 		File[] fileListFacebook = facebookFolder.listFiles();
@@ -674,371 +664,123 @@ public class AFNOR {
 	@SuppressWarnings("boxing")
 	public static void main(String[] args) {
 		
-		int nbGrams = 2;
-		LetterCounter clf = new LetterCounter();
+		File resultsFile = new File("results/");
 		
-//		doW0057(clf, nbGrams);
-//		doW0058(clf, nbGrams);
-//		doW0065(clf, nbGrams);
-//		doW0066(clf, nbGrams);
-//		doW0017(clf, nbGrams);
-//		doW0036(clf, nbGrams);
-//		doW0015(clf, nbGrams);
-//		doEstRep(clf, nbGrams);
-//		doWikipedia(clf, nbGrams);
-//		doTwitter(clf, nbGrams, 1, 4);
-//		doEasyEMails(clf, nbGrams);
-//		doEster(clf, nbGrams);
-//		doCode(clf, nbGrams);
-//		doHtml(clf, nbGrams);
-//		doFacebook(clf, nbGrams);
-		
-		System.out.println();
-
-		///////////////////////
-		///////////////////////
-		///////////////////////
-		///////////////////////
-		
-//		if (true) {
-//			return;
-//		}
-		
-		// Frequencies (and distances) for each result file
-		
-		final Set<String> excludes = new HashSet<String>();
-		excludes.add("freqs");		// excluding existing freq files
-		excludes.add("all");		// excluding existing summary files
-		excludes.add("distances");	// excluding distances folder
-		excludes.add("Est Républicain");
-		
-		File[] countFiles = 
-				new File("results/").listFiles(new FilenameFilter() {
-			
-			public boolean accept(File dir, String name) {
-				boolean keep = !name.startsWith(".") && name.endsWith(".tsv");
-				for (String s : excludes) {
-					keep &= !name.contains(s);
-				}
-//				System.out.println("keep = " + keep);
-				return keep;
-			}
-			
-		});
-		
-		clf.frequenciesFromCounts(countFiles);
-		
-		
-		///////////////////////
-		///////////////////////
-		///////////////////////
-		///////////////////////
-		
-		
-		
-//		if (true) {
-//			return;
-//		}
-		
-		
-		// Summing counts for all result files
-		// Now by group
-		
-		
-		final HashMap<String, ArrayList<File>> countGroups = 
-				new HashMap<String, ArrayList<File>>();
-		
-		countGroups.put("Twitter", new ArrayList<File>());
-		countGroups.put("Code", new ArrayList<File>());
-		countGroups.put("Formals", new ArrayList<File>());
-		
-		final Pattern tweetPattern = Pattern.compile("Twitter");
-		final Pattern codePattern = Pattern.compile(
-				"(?:Java)|(?:Python)|(?:CSS)|(?:CC++)|(?:HTML)");
-		
-		for (File f : countFiles) {
-			if (tweetPattern.matcher(f.getName()).find()) {
-				countGroups.get("Twitter").add(f);
-				System.out.println("Added " + f.getName() + " to Twitter");
-			} else if (codePattern.matcher(f.getName()).find()) {
-				countGroups.get("Code").add(f);
-				System.out.println("Added " + f.getName() + " to Code");
-			} else {
-				countGroups.get("Formals").add(f);
-				System.out.println("Added " + f.getName() + " to Formals");
-			}
+		if (!resultsFile.exists() | !resultsFile.isDirectory()) {
+			System.err.println("Error: Container folder doesn't exist. Abort.");
+			System.exit(-1);
 		}
 		
-		for (String gName : countGroups.keySet()) {
-			System.out.println(gName + ": ");
-			for (File fName : countGroups.get(gName)) {
-				System.out.println("\t" + fName.getName());
-			}
-		}
-
-		for (String gName : countGroups.keySet()) {
-			
-			final HashMap<String, Long> count_1 = new HashMap<String, Long>();
-			final HashMap<String, Long> count_2 = new HashMap<String, Long>();
-			HashMap<String, Long> currentCount = null;
-			
-			long total_1 = 0, total_2 = 0;
-			
-			double frequenciesTotal_1 = 0, frequenciesTotal_2 = 0;
-			
-			try {
-				for (File f : countGroups.get(gName)) {
-					
-					if (f.getName().endsWith("_1.tsv")) {
-						currentCount = count_1;
-					} else if (f.getName().endsWith("_2.tsv")) {
-						currentCount = count_2;
-					} else {
-						System.err.println("Something's fishy here. " 
-								+ f.getName());
-					}
-					
-					BufferedReader reader = new BufferedReader(
-							new FileReader(f) );
-					
-					String line = reader.readLine();
-					
-					Pattern p = Pattern.compile("([^\\d])\\d+$");
-					Matcher m = p.matcher(line);
-					m.find();
-					String sep = m.group(1);
-
-					String[] split;
-					long num;
-					
-					for ( ; line != null ; 
-							line = reader.readLine()) {
-						
-						split = line.split(sep);
-						num = Long.parseLong(split[split.length-1]);
-						
-						if (currentCount.containsKey(split[0])) {
-							currentCount.put(split[0], 
-									currentCount.get(split[0]) + num );
-						} else {
-							currentCount.put(split[0], num );
-						}
-						
-						if (currentCount == count_1) {
-							total_1 += num;
-						} else if (currentCount == count_2) {
-							total_2 += num;
-						} else {
-							System.err.println("Something's fishy there. " 
-									+ f.getName());
-						}
-						
-					}
-					
-					reader.close();
-				}
-				
-				System.out.println("[" + gName + "] Summing: "
-						+ "all " + countGroups.get(gName).size() 
-						+ " output files read.");
-				System.out.println("\t" + count_1.keySet().size()
-						+ " keys in count_1");
-				System.out.println("\t" + count_2.keySet().size()
-						+ " keys in count_2");
-				
-				
-				BufferedWriter writer_1 = new BufferedWriter(
-						new FileWriter("results/" + gName 
-								+ "_all_sums_freqs_1.tsv"));
-				BufferedWriter writer_2 = new BufferedWriter(
-						new FileWriter("results/" + gName 
-								+ "_all_sums_freqs_2.tsv"));
-				
-				ArrayList<String> keys_1 = new ArrayList<String>(
-						count_1.keySet());
-				Collections.sort(keys_1, new Comparator<String>() {
-					public int compare(String o1, String o2) {
-						return count_1.get(o2).compareTo(count_1.get(o1));
-					}
-				});
-				
-				ArrayList<String> keys_2 = new ArrayList<String>(
-						count_2.keySet());
-				Collections.sort(keys_2, new Comparator<String>() {
-					public int compare(String o1, String o2) {
-						return count_2.get(o2).compareTo(count_2.get(o1));
-					}
-				});
-				
-				for (String k1 : keys_1) {
-					writer_1.write( format(k1) + SEP + (1d*count_1.get(k1)
-							/total_1) 
-							+ NEWLINE);
-					frequenciesTotal_1 += (1d*count_1.get(k1)/total_1);
-				}
-				
-				for (String k2 : keys_2) {
-					writer_2.write( format(k2) + SEP + (1d*count_2.get(k2)
-							/total_2) 
-							+ NEWLINE);
-					frequenciesTotal_2 += (1d*count_2.get(k2)/total_2);
-				}
-				
-				writer_1.close();
-				writer_2.close();
-				
-				System.out.println("[" + gName + "] Summing: all_sums files "
-						+ "written. Totals: "
-						+ frequenciesTotal_1 + ", " + frequenciesTotal_2);
-				System.out.println("\t" + keys_1.size()
-						+ " keys in keys_1");
-				System.out.println("\t" + keys_2.size()
-						+ " keys in keys_2");
-				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-				
-			
-			// Averaging frequencies for all result files
-			
-			frequenciesTotal_1 = 0;
-			frequenciesTotal_2 = 0;
-			
-			File[] freqFiles = new File[countGroups.get(gName).size()];
-			for (int i = 0 ; i < countGroups.get(gName).size() ; i++) {
-				freqFiles[i] = new File(countGroups.get(gName).get(i)
-						.getAbsolutePath().replace(".tsv", "_freqs.tsv"));
-//				System.out.println(freqFiles[i]);
-			}
-			
-			final HashMap<String, Double> sum_1 = new HashMap<String, Double>();
-			final HashMap<String, Double> sum_2 = new HashMap<String, Double>();
-			HashMap<String, Double> currentSum = null;
-			
-			double a_1 = 0, a_2 = 0;
-			
-			try {
-				for (File f : freqFiles) {
-					
-					if (f.getName().endsWith("_1_freqs.tsv")) {
-						currentSum = sum_1;
-					} else if (f.getName().endsWith("_2_freqs.tsv")) {
-						currentSum = sum_2;
-					} else {
-						System.err.println("Something's fishy here. " 
-								+ f.getName());
-					}
-					
-					BufferedReader reader = new BufferedReader(
-							new FileReader(f));
-					
-					String line;
-					String[] split;
-					double num;
-					String key;
-					
-					for (line = reader.readLine() ; line != null ; 
-							line = reader.readLine()) {
-						
-						split = line.split(SEP);
-						num = Double.parseDouble(split[split.length-1]);
-						key = "";
-						for (int i = 0 ; i < split.length-2 ; i++) {
-							key += split[i] + " ";
-						}
-						key += split[split.length-2];
-						
-						if (currentSum.containsKey(key)) {
-							
-							currentSum.put(key, currentSum.get(key) 
-									+ num );
-							
-						} else {
-							
-							currentSum.put(key, num );
-							
-						}
-						
-					}
-					
-					if (currentSum == sum_1) {
-						a_1 ++;
-					} else if (currentSum == sum_2) {
-						a_2 ++;
-					} else {
-						System.err.println("Something's fishy there. " 
-								+ f.getName());
-					}
-					
-					reader.close();
-				}
-				
-				System.out.println("[" + gName + "] Averaging: "
-						+ "all " + freqFiles.length + " output files read.");
-				System.out.println("\t" + sum_1.keySet().size()
-						+ " keys in sum_1");
-				System.out.println("\t" + sum_2.keySet().size()
-						+ " keys in sum_2");
-				
-				
-				
-				BufferedWriter writerAvg_1 = new BufferedWriter(
-						new FileWriter("results/" + gName 
-								+ "_all_Avg_freqs_1.tsv"));
-				BufferedWriter writerAvg_2 = new BufferedWriter(
-						new FileWriter("results/" + gName 
-								+ "_all_Avg_freqs_2.tsv"));
-				
-				ArrayList<String> keys_1 = new ArrayList<String>(
-						sum_1.keySet());
-				Collections.sort(keys_1, new Comparator<String>() {
-					public int compare(String o1, String o2) {
-						return sum_1.get(o2).compareTo(sum_1.get(o1));
-					}
-				});
-				
-				ArrayList<String> keys_2 = new ArrayList<String>(
-						sum_2.keySet());
-				Collections.sort(keys_2, new Comparator<String>() {
-					public int compare(String o1, String o2) {
-						return sum_2.get(o2).compareTo(sum_2.get(o1));
-					}
-				});
-				
-				for (String k1 : keys_1) {
-					writerAvg_1.write( format(k1) + SEP + (1d*sum_1.get(k1)/a_1)
-							+ NEWLINE);
-					frequenciesTotal_1 += (1d*sum_1.get(k1)/a_1);
-				}
-				
-				for (String k2 : keys_2) {
-					writerAvg_2.write( format(k2) + SEP + (1d*sum_2.get(k2)/a_2)
-							+ NEWLINE);
-					frequenciesTotal_2 += (1d*sum_2.get(k2)/a_2);
-				}
-				
-				writerAvg_1.close();
-				writerAvg_2.close();
-				
-				System.out.println("[" + gName + "] Averaging: "
-						+ "all_Avg files written. Totals: "
-						+ frequenciesTotal_1 + ", " + frequenciesTotal_2);
-				System.out.println("\t" + keys_1.size()
-						+ " keys in count_1");
-				System.out.println("\t" + keys_2.size()
-						+ " keys in count_2");
-				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+		ArrayList<String[]> groups = new ArrayList<String[]>();
+		groups.add(new String[]{"Wiki", "Wikipedia"});
+		groups.add(new String[]{"Twitter", "Twitter"});
+		groups.add(new String[]{"Facebook", "Facebook"});
+		groups.add(new String[]{"Python", "Code"});
+		groups.add(new String[]{"Javascript", "Code"});
+		groups.add(new String[]{"C++", "Code"});
+		groups.add(new String[]{"Java", "Code"});
+		groups.add(new String[]{"CSS", "Code"});
+		groups.add(new String[]{"HTML", "Code"});
+		groups.add(new String[]{"W0057", "Environment"});
+		groups.add(new String[]{"W0065", "Environment"});
+		groups.add(new String[]{"W0058", "Work"});
+		groups.add(new String[]{"W0066", "Work"});
+		groups.add(new String[]{"W0017", "EUOJ"});
+		groups.add(new String[]{"W0036", "News"});
+		groups.add(new String[]{"W0015", "News"});
+		groups.add(new String[]{"Est Républicain", "News"});
+		groups.add(new String[]{"Ester", "Radio"});
+		groups.add(new String[]{"E0034", "Emails"});
 		
+		
+		FileFilter ff = new FileFilter() {
+			String pattern = ".*_output_\\d\\.tsv";
+			public boolean accept(File pathname) {
+				return !pathname.isDirectory() 
+						&& Pattern.matches(pattern, pathname.getName());
+			}
+		};
+
+		Pattern p = Pattern.compile("^.*[^\\d](\\d+)$");
+		
+		boolean found;
+		HashMap<String, ArrayList<Long>> result = 
+				new HashMap<String, ArrayList<Long>>(); 
+		
+		for (File f : resultsFile.listFiles(ff)) {
+			
+			found = false;
+			
+			// Ugly, sure, but I need constant order
+			for ( String[] g : groups ) {
+				
+				if (f.getName().contains(g[0])) {
+					found = true;
+					
+					// First occurrence of group: create Arraylist & initialize
+					if ( !result.containsKey(g[1]) ) {
+						result.put(g[1], new ArrayList<Long>());
+						result.get(g[1]).add((long) 0);
+						result.get(g[1]).add((long) 0);
+					}
+					
+					// Identify current ngram
+					int ngram = -1;
+					if (f.getName().endsWith("1.tsv")) {
+						ngram = 0;
+					} else if (f.getName().endsWith("2.tsv")) {
+						ngram = 1;
+					} else {
+						System.err.println("Couldn't associate file "
+								+ f.getName() + " to nGram.");
+						System.exit(-2);
+					}
+					
+					
+					// Sum non-space characters up
+					try {
+						BufferedReader reader = new BufferedReader(
+								new FileReader(f));
+
+						String line;
+						for (line = reader.readLine() ; line != null ; 
+								line = reader.readLine()) {
+							
+							Matcher m = p.matcher(line);
+							
+							if (m.matches()) {
+								result.get(g[1]).set(ngram, 
+										result.get(g[1]).get(ngram)
+										+ Integer.parseInt(m.group(1)));
+							}
+							
+						}
+						
+						reader.close();
+					} catch (FileNotFoundException e) {
+						e.printStackTrace();
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					
+					break;
+				}
+				
+			}
+			
+			if (!found) {
+				System.err.println("Couldn't find a match for "
+						+ f.getName());
+			}
+			
 		}
 		
+		for (String group : result.keySet()) {
+			System.out.println(group);
+			for (long ngram : result.get(group)) {
+				System.out.println("\t" + ngram/1e6);
+			}
+		}
 		
 	}
 	

@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.HashMap;
 
-import count.CountLettersFromFile;
+import count.LetterCounter;
 
 /**
  * Replaces all web characters (e.g. '&nbsp;') by their UTF8 equivalent.
